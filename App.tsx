@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Sparkles, Info, RefreshCw, ShieldCheck, Globe } from 'lucide-react';
 import { GoogleGenAI } from "@google/genai";
-import { AppState, BodyAnalysis, Outfit } from './types';
+import { AppState, BodyAnalysis, Outfit, FashionItem } from './types';
 import { generateAffiliateLink } from './services/affiliate';
 
 // Components
@@ -51,7 +51,7 @@ const App: React.FC = () => {
       if (!process.env.API_KEY) throw new Error("API_KEY_MISSING");
       const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
       
-      const analysisPrompt = `Analysiere dieses Foto für eine Modeberatung. Bestimme Körperform (shape), Hautunterton (skinTone), geschätzte Größe (heightEstimate) und den aktuellen Stil-Vibe (baseStyle). Schlage außerdem ein passendes Make-up (makeupAdvice) und passende Farben (undertoneColors als Hex-Codes) vor. Antworte strikt in JSON-Format ohne Markdown.`;
+      const analysisPrompt = `Analysiere dieses Foto für eine Modeberatung. Bestimme Körperform (shape), Hautunterton (skinTone), geschätzte Größe (heightEstimate) und den aktuellen Stil-Vibe (baseStyle). Schlage außerdem ein passendes Make-up (makeupAdvice) und passende Farben (undertoneColors als Hex-Codes) vor. Antworte strikt in JSON-Format ohne Markdown-Wrapper.`;
       
       const analysisRes = await ai.models.generateContent({
         model: 'gemini-3-flash-preview',
@@ -63,7 +63,7 @@ const App: React.FC = () => {
       setAnalysis(analysisData);
 
       setLoadingMessage('Suche passende Trends in Echtzeit...');
-      const searchPrompt = `Suche basierend auf diesem Profil: ${JSON.stringify(analysisData)} nach 3 real existierenden Outfits bei Zalando, H&M oder AboutYou. Antworte im JSON Format: {"outfits": [{"name": "...", "reasoning": "...", "matchScore": 95, "items": [{"name": "...", "brand": "...", "price": "...", "merchantUrl": "...", "imageKeyword": "..."}]}]}. Gib NUR JSON zurück.`;
+      const searchPrompt = `Suche basierend auf diesem Profil: ${JSON.stringify(analysisData)} nach 3 real existierenden Outfits bei Zalando, H&M oder AboutYou. Antworte im JSON Format: {"outfits": [{"name": "...", "reasoning": "...", "matchScore": 95, "items": [{"name": "...", "brand": "...", "price": "...", "merchantUrl": "...", "imageKeyword": "..."}]}]}. Gib NUR nacktes JSON zurück.`;
 
       const searchRes = await ai.models.generateContent({
         model: 'gemini-3-flash-preview',
@@ -79,27 +79,33 @@ const App: React.FC = () => {
       const sources = chunks.filter((c: any) => c.web).map((c: any) => ({ title: c.web.title, uri: c.web.uri }));
       setGroundingSources(sources);
 
-      const enrichedOutfits = (rawData.outfits || []).map((o: any, idx: number) => ({
-        ...o,
+      const mappedOutfits: Outfit[] = (rawData.outfits || []).map((o: any, idx: number) => ({
         id: `search-outfit-${idx}`,
+        name: o.name || 'Trend Look',
+        reasoning: o.reasoning || 'Passend zu deinem Profil.',
+        matchScore: o.matchScore || 90,
         viewerCount: Math.floor(Math.random() * 80) + 10,
-        items: (o.items || []).map((item: any, i: number) => {
-          const originalUrl = item.merchantUrl || `https://www.google.com/search?q=${encodeURIComponent(item.brand + ' ' + item.name)}`;
+        items: (o.items || []).map((item: any, i: number): FashionItem => {
+          const originalUrl = item.merchantUrl || `https://www.google.com/search?q=${encodeURIComponent((item.brand || '') + ' ' + (item.name || ''))}`;
           return {
-            ...item,
             id: `item-${idx}-${i}`,
+            name: item.name || 'Fashion Item',
+            brand: item.brand || 'Premium Selection',
+            price: item.price || 'Bestpreis',
+            category: item.category || 'Bekleidung',
+            imageKeyword: item.imageKeyword || item.name || 'fashion',
             originalUrl: originalUrl,
-            affiliateUrl: generateAffiliateLink(originalUrl, item.brand),
-            imageUrl: `https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=600&q=80&fashion=${encodeURIComponent(item.imageKeyword || item.name)}`
+            affiliateUrl: generateAffiliateLink(originalUrl, item.brand || ''),
+            imageUrl: `https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=600&q=80&fashion=${encodeURIComponent(item.imageKeyword || item.name || 'clothing')}`
           };
         })
       }));
 
-      setOutfits(enrichedOutfits);
+      setOutfits(mappedOutfits);
       setAppState(AppState.RESULTS);
     } catch (e: any) {
-      console.error(e);
-      setError("Verbindung fehlgeschlagen. Bitte prüfe deinen API-Key.");
+      console.error("VOGUE AI Error:", e);
+      setError("Verbindung fehlgeschlagen. Bitte prüfe die API-Konfiguration.");
       setAppState(AppState.IDLE);
     }
   };
@@ -153,12 +159,21 @@ const App: React.FC = () => {
             <div className="lg:col-span-8">
               <header className="mb-16 border-b pb-8 flex justify-between items-end">
                 <h2 className="text-5xl font-serif tracking-tighter">Curated for You.</h2>
-                <button onClick={() => setAppState(AppState.IDLE)} className="text-[10px] font-bold uppercase tracking-widest hover:text-amber-600 flex items-center gap-2"><RefreshCw className="w-3 h-3" /> Neu starten</button>
+                <button onClick={() => {
+                  setAppState(AppState.IDLE);
+                  setTryOnImage(null);
+                  setSelectedOutfit(null);
+                }} className="text-[10px] font-bold uppercase tracking-widest hover:text-amber-600 flex items-center gap-2">
+                  <RefreshCw className="w-3 h-3" /> Neu starten
+                </button>
               </header>
               <OutfitGrid outfits={outfits} onTryOn={handleTryOn} selectedId={selectedOutfit?.id} />
               {groundingSources.length > 0 && (
-                <div className="mt-12 p-6 border rounded-lg bg-zinc-50 flex flex-wrap gap-4">
-                  {groundingSources.map((s, i) => <a key={i} href={s.uri} target="_blank" rel="noreferrer" className="text-xs text-zinc-500 underline">{s.title}</a>)}
+                <div className="mt-12 p-6 border rounded-lg bg-zinc-50">
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-3 flex items-center"><Globe className="w-3 h-3 mr-2" /> Quellen</p>
+                  <div className="flex flex-wrap gap-4">
+                    {groundingSources.map((s, i) => <a key={i} href={s.uri} target="_blank" rel="noreferrer" className="text-xs text-zinc-500 underline hover:text-black">{s.title}</a>)}
+                  </div>
                 </div>
               )}
             </div>
