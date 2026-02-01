@@ -1,0 +1,7 @@
+{
+  "name": "VOGUE AI - Virtual Personal Stylist",
+  "description": "An advanced AI-powered fashion platform that analyzes your body type, suggests personalized outfits, and provides a virtual try-on experience with affiliate monetization.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
