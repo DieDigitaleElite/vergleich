@@ -1,8 +1,8 @@
 
 import React, { useState, useEffect } from 'react';
-import { ShieldCheck, X } from 'lucide-react';
+import { ShieldCheck } from 'lucide-react';
 
-const CookieBanner: React.FC = () => {
+const AppCookieBanner: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
@@ -30,7 +30,7 @@ const CookieBanner: React.FC = () => {
           <div className="space-y-1">
             <h4 className="text-sm font-bold uppercase tracking-widest">Cookie & Affiliate Info</h4>
             <p className="text-xs text-zinc-400 leading-relaxed">
-              Wir nutzen Cookies, um Ihr Erlebnis zu verbessern und die Funktion unserer Affiliate-Links zu gewährleisten. Durch die Nutzung der App stimmen Sie der Verwendung zu.
+              Wir nutzen Cookies zur Verbesserung Ihres Erlebnisses. Durch die Nutzung der App stimmen Sie der Verwendung zu.
             </p>
           </div>
         </div>
@@ -53,4 +53,4 @@ const CookieBanner: React.FC = () => {
   );
 };
 
-export default CookieBanner;
+export default AppCookieBanner;
