@@ -2,13 +2,13 @@
 import React from 'react';
 import { X } from 'lucide-react';
 
-interface LegalModalProps {
+interface AppLegalModalProps {
   isOpen: boolean;
   type: 'impressum' | 'datenschutz' | null;
   onClose: () => void;
 }
 
-const LegalModal: React.FC<LegalModalProps> = ({ isOpen, type, onClose }) => {
+const AppLegalModal: React.FC<AppLegalModalProps> = ({ isOpen, type, onClose }) => {
   if (!isOpen || !type) return null;
 
   return (
@@ -41,14 +41,6 @@ const LegalModal: React.FC<LegalModalProps> = ({ isOpen, type, onClose }) => {
                   E-Mail: style@vogue-ai.de
                 </p>
               </section>
-              <section className="space-y-2">
-                <h3 className="text-sm font-bold uppercase tracking-widest text-zinc-400">Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV</h3>
-                <p className="text-base">
-                  Max Mustermann<br />
-                  Musterstraße 123<br />
-                  10115 Berlin
-                </p>
-              </section>
               <p className="text-[10px] text-zinc-400 pt-8 border-t">
                 Haftungsausschluss: Trotz sorgfältiger inhaltlicher Kontrolle übernehmen wir keine Haftung für die Inhalte externer Links.
               </p>
@@ -57,21 +49,15 @@ const LegalModal: React.FC<LegalModalProps> = ({ isOpen, type, onClose }) => {
             <div className="space-y-8">
               <h2 className="text-3xl font-serif italic mb-8 border-b pb-4">Datenschutzerklärung</h2>
               <section className="space-y-3">
-                <h3 className="text-sm font-bold uppercase tracking-widest text-zinc-400">1. Datenschutz auf einen Blick</h3>
+                <h3 className="text-sm font-bold uppercase tracking-widest text-zinc-400">1. Datenschutz</h3>
                 <p className="text-base leading-relaxed">
-                  Wir freuen uns über Ihr Interesse an unserer App. Der Schutz Ihrer Privatsphäre ist uns sehr wichtig. Wir verarbeiten Ihre hochgeladenen Bilder ausschließlich zum Zwecke der Stilberatung und des Virtual Try-Ons. Bilder werden nicht dauerhaft gespeichert und nach der Session gelöscht.
+                  Der Schutz Ihrer Privatsphäre ist uns sehr wichtig. Wir verarbeiten Ihre hochgeladenen Bilder ausschließlich zum Zwecke der Stilberatung. Bilder werden nicht dauerhaft gespeichert.
                 </p>
               </section>
               <section className="space-y-3">
-                <h3 className="text-sm font-bold uppercase tracking-widest text-zinc-400">2. Affiliate-Links & Tracking</h3>
+                <h3 className="text-sm font-bold uppercase tracking-widest text-zinc-400">2. Affiliate-Links</h3>
                 <p className="text-base leading-relaxed">
-                  Diese App nutzt Affiliate-Partnerprogramme. Wenn Sie auf einen Shop-Link klicken, wird ein Cookie gesetzt, um den Kauf unserer App zuzuordnen.
-                </p>
-              </section>
-              <section className="space-y-3">
-                <h3 className="text-sm font-bold uppercase tracking-widest text-zinc-400">3. KI-Verarbeitung</h3>
-                <p className="text-base leading-relaxed">
-                  Ihre Bilddaten werden verschlüsselt an die Google Gemini API übertragen, um die Analyse durchzuführen. Es findet keine Identitätsfeststellung statt.
+                  Diese App nutzt Affiliate-Partnerprogramme. Bei Klicks auf Shop-Links kann ein Cookie gesetzt werden.
                 </p>
               </section>
             </div>
@@ -82,4 +68,4 @@ const LegalModal: React.FC<LegalModalProps> = ({ isOpen, type, onClose }) => {
   );
 };
 
-export default LegalModal;
+export default AppLegalModal;
