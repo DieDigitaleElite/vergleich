@@ -1,11 +1,11 @@
 
 import React from 'react';
 
-interface FooterProps {
+interface AppFooterProps {
   onOpenLegal: (type: 'impressum' | 'datenschutz') => void;
 }
 
-const Footer: React.FC<FooterProps> = ({ onOpenLegal }) => {
+const AppFooter: React.FC<AppFooterProps> = ({ onOpenLegal }) => {
   return (
     <footer className="bg-white border-t py-12 mt-20">
       <div className="container mx-auto px-4">
@@ -34,4 +34,4 @@ const Footer: React.FC<FooterProps> = ({ onOpenLegal }) => {
   );
 };
 
-export default Footer;
+export default AppFooter;
